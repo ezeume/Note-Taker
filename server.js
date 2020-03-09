@@ -19,7 +19,7 @@ const outputPath = path.join(OUTPUT_DIR, "db.json");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static("_dirname"));
+app.use(express.static("public"));
 var notes = require("./db/db.json");
 
 // API ROUTES
@@ -27,74 +27,36 @@ app.get("/api/notes", function (req, res) {
     res.json(notes);
 });
 
-app.get("/notes", function(req, res) {
-    res.sendFile(path.join(__dirname, "puplic/notes.html"));
-  });
-
-  app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "puplic/index.html"));
-  });
-
-
-// Sets up the Express app to handle data parsing
-
-
 //post
-app.post("/api/notes", function (req, res){
+app.post("/api/notes", function (req, res) {
     var newNote = req.body;
-    newNote.routeName = newNote.title.replace(/\s+/g, "").toLowerCase();
     newNote.id = i++
     notes.push(newNote);
+    res.json(newNote)
 })
-
-
-
-
-
-
-//writeFile
-
-fs.writeFile(outputPath, JSON.stringify(notes), function (err) {
-    if (err) {
-        // throw err
-        // return console.log(err);
-    }
-    res.json(newNote);
-});
-
-
-
-
-// // // when the user goes to localhost:3000/notes the user will see the notes.html file
-
-// // // when the user goes to localhost:3000 the user will see the index.html file
 
 //delete function
 
 
-// app.delete(`/api/notes/:id`, function(req,res) {
-//     var noteId = req.params.id;
-//     for (var i =0; i < notes.length; i++) {
-//         if (noteId == notes[i].id){
-//             notes.spliced(i, 1);
+app.delete(`/api/notes/:id`, function(req,res) {
+    var noteId = req.params.id;
+    for (var i =0; i < notes.length; i++) {
+        if (noteId == notes[i].id){
+            notes.splice(i, 1);
+        }
+    }
+   res.json(notes)
+})
 
-//             fs.writeFile(outputPath, JSON.stringify(notes), function (err) {
-//                 if (err) {
-//                     throw err
-//                 }
-//             })
-//         }
-//     }
-// })
+// HTML ROUTES
+app.get("/notes", function (req, res) {
+    res.sendFile(path.join(__dirname, "public/notes.html"));
+});
 
+app.get("*", function (req, res) {
+    res.sendFile(path.join(__dirname, "public/index.html"));
+});
 
-
-
-
-
-
-// Starts the server to begin listening
-// =============================================================
 app.listen(PORT, function () {
     console.log("App listening on PORT " + PORT);
 });
